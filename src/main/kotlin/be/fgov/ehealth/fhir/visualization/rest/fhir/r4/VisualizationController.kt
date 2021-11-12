@@ -44,15 +44,18 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
         response: ServerHttpResponse,
         embedInHtml: Boolean
     ): Mono<Void> {
+        response.headers.set("Content-Type", "text/html")
+        return response.writeWith(Mono.just(response.bufferFactory().wrap(makeNarrative(fhirData, embedInHtml))))
+    }
+
+    private fun makeNarrative(fhirData: ByteArray, embedInHtml: Boolean): ByteArray {
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = stripNarratives(ctx, parser.parseResource(Bundle::class.java, fhirData.toString(Charsets.UTF_8)))
-        val htmlOrDiv = if (embedInHtml) {
+        return if (embedInHtml) {
             diagnosticReportHtmlGenerator.generateHtmlRepresentation(ctx, bundle, null)
         } else {
             diagnosticReportHtmlGenerator.generateDivRepresentation(ctx, bundle, null).toByteArray(Charsets.UTF_8)
         }
-        response.headers.set("Content-Type", "text/html")
-        return response.writeWith(Mono.just(response.bufferFactory().wrap(htmlOrDiv)))
     }
 }
