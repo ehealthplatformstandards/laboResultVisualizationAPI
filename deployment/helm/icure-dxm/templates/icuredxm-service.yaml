@@ -1,0 +1,20 @@
+{{- if .Values.images.fhirviz.replicaCount }}
+apiVersion: v1
+kind: Service
+metadata:
+    name: "{{ template "fullname" . }}"
+    labels:
+        app: {{ template "name" . }}
+        chart: {{ template "chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+spec:
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: http
+          name: http
+    selector:
+        app: {{ template "name" . }}
+        release: {{ .Release.Name }}
+        {{- end }}

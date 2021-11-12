@@ -1,0 +1,89 @@
+{{- if .Values.images.fhirviz.replicaCount }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: "{{ template "fullname" . }}"
+    labels:
+        app: {{ template "name" . }}
+        chart: {{ template "chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+spec:
+    replicas: {{ .Values.images.fhirviz.replicaCount }}
+    selector:
+        matchLabels:
+            app: {{ template "name" . }}
+            release: {{ .Release.Name }}
+    template:
+        metadata:
+            labels:
+                app: {{ template "name" . }}
+                release: {{ .Release.Name }}
+        spec:
+          #terminationGracePeriodSeconds: 180
+            containers:
+                - name: "{{ .Chart.Name }}"
+                  image: "{{ .Values.images.fhirviz.repository }}:{{ .Values.images.fhirviz.tag | default .Chart.Version }}"
+                  imagePullPolicy: "{{ .Values.pullPolicy }}"
+                  ports:
+                      - containerPort: 8912
+                        name: http
+                          {{- if or .Values.images.fhirviz.debug .Values.images.fhirviz.debugsuspend }}
+                      - containerPort: 5005
+                        name: "jvm-debug"
+                        {{- end }}
+                  env:
+                      - name: JAVA_OPTS
+                        value: "{{ .Values.images.fhirviz.javaOpts }}{{ if .Values.images.fhirviz.debug }} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005{{ end }}{{ if .Values.images.fhirviz.debugsuspend }} -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005{{ end }}"
+                      - name: NODE_NAME
+                        valueFrom:
+                            fieldRef:
+                                fieldPath: spec.nodeName
+                      - name: POD_NAME
+                        valueFrom:
+                            fieldRef:
+                                fieldPath: metadata.name
+                      - name: POD_NAMESPACE
+                        valueFrom:
+                            fieldRef:
+                                fieldPath: metadata.namespace
+                      {{- range $key, $value := .Values.images.fhirviz.env }}
+                      - name: {{ $key }}
+                        value: {{ $value | quote }}
+                      {{- end }}
+                  resources:
+                      requests:
+                          memory: {{ .Values.images.fhirviz.memoryRequest | quote }}
+                              {{- if .Values.images.fhirviz.cpuRequest }}
+                          cpu: {{ .Values.images.fhirviz.cpuRequest | quote }}
+                          {{- end }}
+                      limits:
+                          memory: {{ .Values.images.fhirviz.memoryLimit | default .Values.images.fhirviz.memoryRequest | quote }}
+                              {{- if .Values.images.fhirviz.cpuLimit }}
+                          cpu: {{ .Values.images.fhirviz.cpuLimit | quote }}
+                        {{- end }}
+                  {{- if not .Values.images.fhirviz.noReadiness }}
+                  readinessProbe:
+                      httpGet:
+                          path: /actuator/health
+                          port: 8912
+                      initialDelaySeconds: 30
+                      periodSeconds: 15
+                      timeoutSeconds: 1
+                      successThreshold: 1
+                      failureThreshold: 3
+                  {{- end }}
+                  {{- if not .Values.images.fhirviz.noLiveness }}
+                  livenessProbe:
+                      httpGet:
+                          path: /actuator/health
+                          port: 8912
+                      initialDelaySeconds: 600
+                      periodSeconds: 15
+                      timeoutSeconds: 2
+                      successThreshold: 1
+                      failureThreshold: 10
+                  {{- end }}
+            imagePullSecrets:
+                - name: regsecret
+{{- end }}
