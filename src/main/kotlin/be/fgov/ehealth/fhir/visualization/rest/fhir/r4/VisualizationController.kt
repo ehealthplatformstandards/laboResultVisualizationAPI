@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono
 @RequestMapping("/rest/fhir/r4/viz")
 @Tag(name = "fhir")
 class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticReportHtmlGenerator) {
-    @PostMapping(consumes = ["application/json", "application/xml"])
+    @PostMapping("/html", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to html")
     fun html(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> {
         val ctx = FhirContext.forR4()
@@ -31,7 +31,7 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
         return response.writeWith(Mono.just(response.bufferFactory().wrap(html)))
     }
 
-    @PostMapping(consumes = ["application/json", "application/xml"])
+    @PostMapping("/div", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to embeddable div")
     fun div(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> {
         val ctx = FhirContext.forR4()
