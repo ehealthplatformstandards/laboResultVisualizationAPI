@@ -30,7 +30,7 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
         makeResponse(fhirFile, response, false)
 
     @PostMapping("/html/single")
-    @Operation(summary = "Convert FHIR file to html")
+    @Operation(summary = "Convert FHIR file provided as multipart request to html")
     fun htmlMultipartSingle(@RequestPart("file") fhirFilePart: Mono<FilePart>, response: ServerHttpResponse): Mono<Void> =
         fhirFilePart.flatMap { it.content().mergeDataBuffers() }.flatMap { fhirFile -> makeResponse(fhirFile, response, true) }
 
