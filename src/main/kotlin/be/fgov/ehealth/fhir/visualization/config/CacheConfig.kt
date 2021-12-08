@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 @Configuration
 class CacheConfig {
     @Bean
-    fun apiCacheManager(): CacheManager = CaffeineCacheManager("User", "LoincCode").apply {
+    fun cacheManager(): CacheManager = CaffeineCacheManager("User", "LoincCode", "Validator").apply {
         isAllowNullValues = false
         setCaffeine(
             Caffeine.newBuilder()

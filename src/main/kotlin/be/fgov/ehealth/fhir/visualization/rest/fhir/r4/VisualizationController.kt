@@ -1,31 +1,28 @@
 package be.fgov.ehealth.fhir.visualization.rest.fhir.r4
 
 import be.fgov.ehealth.fhir.narrative.gen.DiagnosticReportHtmlGenerator
-import be.fgov.ehealth.fhir.narrative.option.FhirValidator
 import be.fgov.ehealth.fhir.narrative.utils.FhirNarrativeUtils.stripNarratives
 import be.fgov.ehealth.fhir.visualization.dto.HtmlWithValidation
+import be.fgov.ehealth.fhir.visualization.service.ValidatorService
 import ca.uhn.fhir.context.FhirContext
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.reactor.mono
 import mergeDataBuffers
 import org.hl7.fhir.r4.model.Bundle
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.server.reactive.ServerHttpResponse
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
-import java.io.PrintStream
 
 @ExperimentalStdlibApi
 @ExperimentalCoroutinesApi
 @RestController
 @RequestMapping("/rest/fhir/r4/viz")
 @Tag(name = "fhir")
-class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticReportHtmlGenerator) {
-    val fhirValidator = FhirValidator(
-        PrintStream(System.out),
-        listOf("https://build.fhir.org/ig/hl7-be/hl7-be-fhir-laboratory-report")
-    )
+class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticReportHtmlGenerator, val validatorService: ValidatorService) {
+    fun fhirValidator() = validatorService.getValidator(listOf("https://build.fhir.org/ig/hl7-be/hl7-be-fhir-laboratory-report"))
 
     @PostMapping("/html", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to html")
@@ -34,14 +31,15 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
 
     @PostMapping("/html/validate", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Validate and convert FHIR file to object including validation information and html representation")
-    fun htmlAndValidate(@RequestBody fhirFile: ByteArray) =
-        fhirValidator.validate(fhirFile).let { (errors, validationReport) ->
+    fun htmlAndValidate(@RequestBody fhirFile: ByteArray) = mono {
+        fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
             HtmlWithValidation(
                 html = makeNarrative(fhirFile, true).toString(Charsets.UTF_8),
                 errors = errors,
                 validation = validationReport
             )
         }
+    }
 
     @PostMapping("/div", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to embeddable div")
@@ -50,14 +48,15 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
 
     @PostMapping("/div/validate", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Validate and convert FHIR file to object including validation information and embeddable div")
-    fun divAndValidate(@RequestBody fhirFile: ByteArray) =
-        fhirValidator.validate(fhirFile).let { (errors, validationReport) ->
+    fun divAndValidate(@RequestBody fhirFile: ByteArray) = mono {
+        fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
             HtmlWithValidation(
                 html = makeNarrative(fhirFile, false).toString(Charsets.UTF_8),
                 errors = errors,
                 validation = validationReport
             )
         }
+    }
 
     @PostMapping("/html/single")
     @Operation(summary = "Convert FHIR file provided as multipart request to html")
@@ -72,16 +71,19 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
     @Operation(summary = "Convert FHIR file provided as multipart request to html")
     fun htmlAndValidateMultipartSingle(
         @RequestPart("file") fhirFilePart: Mono<FilePart>
-    ) = fhirFilePart.flatMap { it.content().mergeDataBuffers() }
-        .map { fhirFile ->
-            fhirValidator.validate(fhirFile).let { (errors, validationReport) ->
-                HtmlWithValidation(
-                    html = makeNarrative(fhirFile, true).toString(Charsets.UTF_8),
-                    errors = errors,
-                    validation = validationReport
-                )
+    ) = mono {
+        val validator = fhirValidator().await()
+        fhirFilePart.flatMap { it.content().mergeDataBuffers() }
+            .map { fhirFile ->
+                validator.validate(fhirFile).let { (errors, validationReport) ->
+                    HtmlWithValidation(
+                        html = makeNarrative(fhirFile, true).toString(Charsets.UTF_8),
+                        errors = errors,
+                        validation = validationReport
+                    )
+                }
             }
-        }
+    }
 
     @PostMapping("/div/single")
     @Operation(summary = "Convert FHIR file provided as multipart request to embeddable div")
@@ -91,9 +93,10 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
 
     @PostMapping("/div/single/validate")
     @Operation(summary = "Convert FHIR file provided as multipart request to object comprised of validation information and embeddable div")
-    fun divAndValidateMultipartSingle(@RequestPart("file") fhirFilePart: Mono<FilePart>) =
+    fun divAndValidateMultipartSingle(@RequestPart("file") fhirFilePart: Mono<FilePart>) = mono {
+        val validator = fhirValidator().await()
         fhirFilePart.flatMap { it.content().mergeDataBuffers() }.map { fhirFile ->
-            fhirValidator.validate(fhirFile).let { (errors, validationReport) ->
+            validator.validate(fhirFile).let { (errors, validationReport) ->
                 HtmlWithValidation(
                     html = makeNarrative(fhirFile, false).toString(Charsets.UTF_8),
                     errors = errors,
@@ -101,6 +104,7 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
                 )
             }
         }
+    }
 
     private fun makeResponse(
         fhirData: ByteArray,

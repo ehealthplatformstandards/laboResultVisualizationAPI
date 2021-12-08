@@ -71,6 +71,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.12.5")
 
+    implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.0.4")
+
     // Logging
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.6")
     implementation(group = "ch.qos.logback", name = "logback-access", version = "1.2.6")
