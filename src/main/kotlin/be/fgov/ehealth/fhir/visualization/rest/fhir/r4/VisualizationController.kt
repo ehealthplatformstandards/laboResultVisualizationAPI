@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono
 @RequestMapping("/rest/fhir/r4/viz")
 @Tag(name = "fhir")
 class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticReportHtmlGenerator, val validatorService: ValidatorService) {
-    fun fhirValidator() = validatorService.getValidator(listOf("https://build.fhir.org/ig/hl7-be/hl7-be-fhir-laboratory-report"))
+    fun fhirValidator() = validatorService.getValidatorAsync(listOf("https://build.fhir.org/ig/hl7-be/hl7-be-fhir-laboratory-report"))
 
     @PostMapping("/html", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to html")
