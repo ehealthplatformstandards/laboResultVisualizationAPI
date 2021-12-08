@@ -17,6 +17,7 @@ class ValidatorService {
 
     @Cacheable(cacheNames = ["Validator"])
     fun getValidatorAsync(implementationGuideUrls: List<String>): Deferred<FhirValidator> = CoroutineScope(Dispatchers.IO).async {
+        //Concurrent access exceptions can happen when filesystem is used concurrently by two different validators being created at the same time
         mutex.withLock {
             FhirValidator(PrintStream(System.out), implementationGuideUrls)
         }

@@ -71,19 +71,19 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
     @Operation(summary = "Convert FHIR file provided as multipart request to html")
     fun htmlAndValidateMultipartSingle(
         @RequestPart("file") fhirFilePart: Mono<FilePart>
-    ) = mono {
-        val validator = fhirValidator().await()
-        fhirFilePart.flatMap { it.content().mergeDataBuffers() }
-            .map { fhirFile ->
-                validator.validate(fhirFile).let { (errors, validationReport) ->
-                    HtmlWithValidation(
-                        html = makeNarrative(fhirFile, true).toString(Charsets.UTF_8),
-                        errors = errors,
-                        validation = validationReport
-                    )
+    ) = fhirFilePart.flatMap { it.content().mergeDataBuffers() }
+            .flatMap { fhirFile ->
+                mono {
+                    fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
+                        HtmlWithValidation(
+                            html = makeNarrative(fhirFile, true).toString(Charsets.UTF_8),
+                            errors = errors,
+                            validation = validationReport
+                        )
+                    }
                 }
             }
-    }
+
 
     @PostMapping("/div/single")
     @Operation(summary = "Convert FHIR file provided as multipart request to embeddable div")
@@ -93,18 +93,19 @@ class VisualizationController(val diagnosticReportHtmlGenerator: DiagnosticRepor
 
     @PostMapping("/div/single/validate")
     @Operation(summary = "Convert FHIR file provided as multipart request to object comprised of validation information and embeddable div")
-    fun divAndValidateMultipartSingle(@RequestPart("file") fhirFilePart: Mono<FilePart>) = mono {
-        val validator = fhirValidator().await()
-        fhirFilePart.flatMap { it.content().mergeDataBuffers() }.map { fhirFile ->
-            validator.validate(fhirFile).let { (errors, validationReport) ->
-                HtmlWithValidation(
-                    html = makeNarrative(fhirFile, false).toString(Charsets.UTF_8),
-                    errors = errors,
-                    validation = validationReport
-                )
+    fun divAndValidateMultipartSingle(@RequestPart("file") fhirFilePart: Mono<FilePart>) =
+        fhirFilePart.flatMap { it.content().mergeDataBuffers() }.flatMap { fhirFile ->
+            mono {
+                fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
+                    HtmlWithValidation(
+                        html = makeNarrative(fhirFile, false).toString(Charsets.UTF_8),
+                        errors = errors,
+                        validation = validationReport
+                    )
+                }
             }
         }
-    }
+
 
     private fun makeResponse(
         fhirData: ByteArray,
