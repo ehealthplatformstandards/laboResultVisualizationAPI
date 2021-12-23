@@ -54,7 +54,7 @@ repositories {
 }
 
 dependencies {
-    implementation("be.fgov.ehealth:fhir-visualization-tool:1.0-SNAPSHOT")
+    implementation("be.fgov.ehealth:fhir-visualization-tool:1.1")
     implementation("io.icure:async-jackson-http-client:0.1.4-6cab16ec6e")
     implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:4.1.0")
     implementation("ca.uhn.hapi.fhir:hapi-fhir-base:4.1.0")
