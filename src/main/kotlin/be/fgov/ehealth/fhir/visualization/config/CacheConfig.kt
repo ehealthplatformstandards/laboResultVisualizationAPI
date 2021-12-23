@@ -14,7 +14,7 @@ class CacheConfig {
         isAllowNullValues = false
         setCaffeine(
             Caffeine.newBuilder()
-                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .expireAfterAccess(12, TimeUnit.HOURS)
         )
     }
 }
