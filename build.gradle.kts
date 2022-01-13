@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import se.transmode.gradle.plugins.docker.DockerTask
 
 plugins {
     kotlin("jvm") version "1.5.31"
@@ -37,12 +36,16 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 apply(plugin = "docker-java")
 apply(plugin = "helm-repository")
 
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     languageVersion = "1.5"
     jvmTarget = "11"
 }
 
+configure<com.taktik.gradle.plugins.flowr.DockerJavaPluginExtension> {
+    imageRepoAndName = "taktik/ehealth-fhirviz"
+
+}
 repositories {
     mavenCentral()
     maven {
@@ -84,10 +87,6 @@ dependencies {
     implementation(group = "org.springdoc", name = "springdoc-openapi-kotlin", version = "1.5.11")
 
     implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.0.3")
-}
-
-tasks.withType<DockerTask> {
-    tag = "taktik/ehealth-fhirviz"
 }
 
 tasks.withType<KotlinCompile> {
