@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import se.transmode.gradle.plugins.docker.DockerTask
 
 plugins {
     kotlin("jvm") version "1.5.31"
@@ -83,6 +84,10 @@ dependencies {
     implementation(group = "org.springdoc", name = "springdoc-openapi-kotlin", version = "1.5.11")
 
     implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.0.3")
+}
+
+tasks.withType<DockerTask> {
+    tag = "taktik/ehealth-fhirviz"
 }
 
 tasks.withType<KotlinCompile> {
