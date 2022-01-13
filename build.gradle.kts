@@ -74,8 +74,8 @@ dependencies {
     implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.0.4")
 
     // Logging
-    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.6")
-    implementation(group = "ch.qos.logback", name = "logback-access", version = "1.2.6")
+    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.10")
+    implementation(group = "ch.qos.logback", name = "logback-access", version = "1.2.10")
     implementation(group = "com.taktik.boot", name = "spring-boot-starter-gke-logging", version = "2.1.174-0f038f8004")
 
     // Swagger
@@ -83,9 +83,6 @@ dependencies {
     implementation(group = "org.springdoc", name = "springdoc-openapi-kotlin", version = "1.5.11")
 
     implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.0.3")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(group= "io.icure", name = "diff-utils", version = "0.1.0-4e34e924bc")
 }
 
 tasks.withType<KotlinCompile> {
