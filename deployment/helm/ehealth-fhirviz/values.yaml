@@ -10,7 +10,7 @@ ingressIP: "" # defined during helm install
 
 images:
   fhirviz:
-    repository: "docker.taktik.be/ehealth-fhirviz"
+    repository: "taktik/ehealth-fhirviz"
     tag: ""
     replicaCount: 1
     javaOpts: "-XX:MaxRAMPercentage=70"
