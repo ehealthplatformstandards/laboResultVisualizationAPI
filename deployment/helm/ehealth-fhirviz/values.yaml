@@ -1,9 +1,7 @@
 pullPolicy: "IfNotPresent"
-ingressIP: "" # defined during helm install
+ingressClassName: "haproxy"
 #tls:
-#  - credentialsSecretName: voyager-ovh-example-com
-#    provider: ovh
-#    refName: tls-example-com # deprecated
+#  - secretName: tls-example-com
 #    hosts:
 #      - one.example.com
 #      - two.example.com
@@ -19,3 +17,6 @@ images:
     cpuLimit: 2
     debug: true
     env: {}
+
+paths:
+  /: {}
