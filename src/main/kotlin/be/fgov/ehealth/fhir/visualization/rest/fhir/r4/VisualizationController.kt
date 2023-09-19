@@ -2,6 +2,7 @@ package be.fgov.ehealth.fhir.visualization.rest.fhir.r4
 
 import be.fgov.ehealth.fhir.narrative.gen.ResourceHtmlGenerator
 import be.fgov.ehealth.fhir.visualization.dto.HtmlWithValidation
+import be.fgov.ehealth.fhir.visualization.dto.Validation
 import be.fgov.ehealth.fhir.visualization.service.ValidatorService
 import ca.uhn.fhir.context.FhirContext
 import io.swagger.v3.oas.annotations.Operation
@@ -66,7 +67,6 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
                 validation = validationReport
             )
         }
-     //TODO
     }
 
     @PostMapping("vaccination/html/validate", consumes = ["application/json", "application/xml"])
@@ -81,6 +81,17 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
             )
         }
 
+    }
+
+    @PostMapping("lab/validate", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Validate laboratory report")
+    fun validateLab(@RequestBody fhirFile: ByteArray) = mono {
+
+        fhirValidator().await().validate(fhirFile).let { (errors) ->
+            Validation(
+                    errors = errors
+            )
+        }
     }
 
     @PostMapping("lab/div", consumes = ["application/json", "application/xml"])
@@ -218,6 +229,7 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
                     }
                 }
             }
+
 
 
     private fun makeResponseLab(
