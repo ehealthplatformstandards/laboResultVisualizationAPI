@@ -10,14 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runBlocking
-import mergeDataBuffers
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.FhirNarrativeUtils
-import org.hl7.fhir.r4.model.Immunization
-import org.springframework.http.codec.multipart.FilePart
+import org.hl7.fhir.r4.model.*
 import org.springframework.http.server.reactive.ServerHttpResponse
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.reactive.config.CorsRegistry
 import reactor.core.publisher.Mono
 import java.util.*
 
@@ -28,7 +23,12 @@ import java.util.*
 @RequestMapping("/rest/fhir/r4/viz")
 @Tag(name = "fhir")
 class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, val validatorService: ValidatorService) {
-    fun fhirValidator() = validatorService.getValidatorAsync(listOf("https://www.ehealth.fgov.be/standards/fhir/lab", "https://www.ehealth.fgov.be/standards/fhir/allergy"))
+    fun fhirValidator() = validatorService.getValidatorAsync(listOf(
+            "https://www.ehealth.fgov.be/standards/fhir/lab",
+            "https://www.ehealth.fgov.be/standards/fhir/vaccination",
+            "https://www.ehealth.fgov.be/standards/fhir/allergy",
+            "https://build.fhir.org/ig/hl7-be/referral/branches/earlyadopter/"
+            ))
 
     fun getMimeType(@RequestBody fhirFile: ByteArray): Char {
         return String(fhirFile)[0]
@@ -48,12 +48,22 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
     @PostMapping("lab/html", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to html")
     fun htmlLab(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
-        makeResponseLab(fhirFile, response, true, String(fhirFile)[0])
+        makeResponse(fhirFile, response, true, "lab", String(fhirFile)[0])
 
     @PostMapping("vaccination/html", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to html")
     fun htmlVaccination(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
-            makeResponseVaccination(fhirFile, response, true, String(fhirFile)[0])
+            makeResponse(fhirFile, response, true, "vaccination", String(fhirFile)[0])
+
+    @PostMapping("allergy/html", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Convert FHIR file to html")
+    fun htmlAllergy(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
+            makeResponse(fhirFile, response, true, "allergy", String(fhirFile)[0])
+
+    @PostMapping("referral/html", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Convert FHIR file to html")
+    fun htmlReferral(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
+            makeResponse(fhirFile, response, true, "referral", String(fhirFile)[0])
 
 
     @PostMapping("lab/html/validate", consumes = ["application/json", "application/xml"])
@@ -83,6 +93,34 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
 
     }
 
+    @PostMapping("allergy/html/validate", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Validate and convert FHIR file to object including validation information and html representation")
+    fun htmlAndValidateAllergy(@RequestBody fhirFile: ByteArray) = mono {
+
+        fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
+            HtmlWithValidation(
+                    html = makeNarrative(fhirFile, true,"allergy", getMimeType(fhirFile)).toString(Charsets.UTF_8),
+                    errors = errors,
+                    validation = validationReport
+            )
+        }
+
+    }
+
+    @PostMapping("referral/html/validate", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Validate and convert FHIR file to object including validation information and html representation")
+    fun htmlAndValidateReferral(@RequestBody fhirFile: ByteArray) = mono {
+
+        fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
+            HtmlWithValidation(
+                    html = makeNarrative(fhirFile, true,"referral", getMimeType(fhirFile)).toString(Charsets.UTF_8),
+                    errors = errors,
+                    validation = validationReport
+            )
+        }
+
+    }
+
     @PostMapping("lab/validate", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Validate laboratory report")
     fun validateLab(@RequestBody fhirFile: ByteArray) = mono {
@@ -94,15 +132,53 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
         }
     }
 
-    @PostMapping("lab/div", consumes = ["application/json", "application/xml"])
+    @PostMapping("vaccination/validate", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Validate vaccination report")
+    fun validateVaccination(@RequestBody fhirFile: ByteArray) = mono {
+
+        fhirValidator().await().validate(fhirFile).let { (errors) ->
+            Validation(
+                    errors = errors
+            )
+        }
+    }
+
+    @PostMapping("allergy/validate", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Validate vaccination report")
+    fun validateAllergy(@RequestBody fhirFile: ByteArray) = mono {
+
+        fhirValidator().await().validate(fhirFile).let { (errors) ->
+            Validation(
+                    errors = errors
+            )
+        }
+    }
+
+    @PostMapping("referral/validate", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Validate referral report")
+    fun validateReferral(@RequestBody fhirFile: ByteArray) = mono {
+
+        fhirValidator().await().validate(fhirFile).let { (errors) ->
+            Validation(
+                    errors = errors
+            )
+        }
+    }
+
+    /*@PostMapping("lab/div", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to embeddable div")
     fun divLab(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
-        makeResponseLab(fhirFile, response, false, String(fhirFile)[0])
+        makeResponse(fhirFile, response,  false,"lab", String(fhirFile)[0])
 
     @PostMapping("vaccination/div", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Convert FHIR file to embeddable div")
     fun divVaccination(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
-            makeResponseVaccination(fhirFile, response, false, String(fhirFile)[0])
+            makeResponse(fhirFile, response, false,"vaccination", String(fhirFile)[0])
+
+    @PostMapping("referral/div", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Convert FHIR file to embeddable div")
+    fun divReferral(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
+            makeResponse(fhirFile, response, false,"referral", String(fhirFile)[0])
 
     @PostMapping("lab/div/validate", consumes = ["application/json", "application/xml"])
     @Operation(summary = "Validate and convert FHIR file to object including validation information and embeddable div")
@@ -130,6 +206,19 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
         }
     }
 
+    @PostMapping("referral/div/validate", consumes = ["application/json", "application/xml"])
+    @Operation(summary = "Validate and convert FHIR file to object including validation information and embeddable div")
+    fun divAndValidateReferral(@RequestBody fhirFile: ByteArray) = mono {
+
+        fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
+            HtmlWithValidation(
+                    html = makeNarrative(fhirFile, false,"referral", getMimeType(fhirFile)).toString(Charsets.UTF_8),
+                    errors = errors,
+                    validation = validationReport
+            )
+        }
+    }*/
+
     /*@PostMapping("html/single")
     @Operation(summary = "Convert FHIR file provided as multipart request to html")
     fun htmlMultipartSingleLab(
@@ -148,7 +237,7 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
             fhirFilePart.flatMap { it.content().mergeDataBuffers() }
                     .flatMap { fhirFile -> makeResponseVaccination(fhirFile, response, true) }*/
 
-    @PostMapping("lab/html/single/validate")
+    /*@PostMapping("lab/html/single/validate")
     @Operation(summary = "Convert FHIR file provided as multipart request to html")
     fun htmlAndValidateMultipartSingleLab(
         @RequestPart("file") fhirFilePart: Mono<FilePart>
@@ -184,6 +273,24 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
                 }
             }
 
+    @PostMapping("referral/html/single/validate")
+    @Operation(summary = "Convert FHIR file provided as multipart request to html")
+    fun htmlAndValidateMultipartSingleReferral(
+            @RequestPart("file") fhirFilePart: Mono<FilePart>
+    ) = fhirFilePart.flatMap { it.content().mergeDataBuffers() }
+            .flatMap { fhirFile ->
+                mono {
+
+                    fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
+                        HtmlWithValidation(
+                                html = makeNarrative(fhirFile, true,"referral", getMimeType(fhirFile)).toString(Charsets.UTF_8),
+                                errors = errors,
+                                validation = validationReport
+                        )
+                    }
+                }
+            }*/
+
 
     /*@PostMapping("div/single")
     @Operation(summary = "Convert FHIR file provided as multipart request to embeddable div")
@@ -198,7 +305,7 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
                     .flatMap { fhirFile -> makeResponseVaccination(fhirFile, response, false) }
 */
 
-    @PostMapping("lab/div/single/validate")
+    /*@PostMapping("lab/div/single/validate")
     @Operation(summary = "Convert FHIR file provided as multipart request to object comprised of validation information and embeddable div")
     fun divAndValidateMultipartSingleLab(@RequestPart("file") fhirFilePart: Mono<FilePart>) =
         fhirFilePart.flatMap { it.content().mergeDataBuffers() }.flatMap { fhirFile ->
@@ -230,26 +337,32 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
                 }
             }
 
+    @PostMapping("referral/div/single/validate")
+    @Operation(summary = "Convert FHIR file provided as multipart request to object comprised of validation information and embeddable div")
+    fun divAndValidateMultipartSingleReferral(@RequestPart("file") fhirFilePart: Mono<FilePart>) =
+            fhirFilePart.flatMap { it.content().mergeDataBuffers() }.flatMap { fhirFile ->
+                mono {
+
+                    fhirValidator().await().validate(fhirFile).let { (errors, validationReport) ->
+                        HtmlWithValidation(
+                                html = makeNarrative(fhirFile, false, "referral", getMimeType(fhirFile)).toString(Charsets.UTF_8),
+                                errors = errors,
+                                validation = validationReport
+                        )
+                    }
+                }
+            }*/
 
 
-    private fun makeResponseLab(
-        fhirData: ByteArray,
-        response: ServerHttpResponse,
-        embedInHtml: Boolean,
-        fileType: Char
-    ): Mono<Void> {
-        response.headers.set("Content-Type", "text/html")
-        return response.writeWith(Mono.just(response.bufferFactory().wrap(makeNarrative(fhirData, embedInHtml, "lab", fileType))))
-    }
-
-    private fun makeResponseVaccination(
+    private fun makeResponse(
             fhirData: ByteArray,
             response: ServerHttpResponse,
             embedInHtml: Boolean,
+            resourceType: String,
             fileType: Char
     ): Mono<Void> {
         response.headers.set("Content-Type", "text/html")
-        return response.writeWith(Mono.just(response.bufferFactory().wrap(makeNarrative(fhirData, embedInHtml, "vaccination", fileType))))
+        return response.writeWith(Mono.just(response.bufferFactory().wrap(makeNarrative(fhirData, embedInHtml, resourceType, fileType))))
     }
 
 
@@ -283,9 +396,26 @@ class VisualizationController(val resourceHtmlGenerator: ResourceHtmlGenerator, 
                     resourceHtmlGenerator.generateDivRepresentation(ctx, immunization, null).toByteArray(Charsets.UTF_8)
                 }
             }
+            "allergy" -> {
+                val unstrippedAllergyIntolerance = parser.parseResource(AllergyIntolerance::class.java, fhirData.toString(Charsets.UTF_8))
+                val allergyIntolerance = FhirNarrativeUtils.stripNarratives(unstrippedAllergyIntolerance)
+                return if (embedInHtml) {
+                    resourceHtmlGenerator.generateHtmlRepresentation(ctx, allergyIntolerance, null)
+                } else {
+                    resourceHtmlGenerator.generateDivRepresentation(ctx, allergyIntolerance, null).toByteArray(Charsets.UTF_8)
+                }
+            }
+            "referral" -> {
+                val unstrippedServiceRequest = parser.parseResource(ServiceRequest::class.java, fhirData.toString(Charsets.UTF_8))
+                val serviceRequest = FhirNarrativeUtils.stripNarratives(unstrippedServiceRequest)
+                return if (embedInHtml) {
+                    resourceHtmlGenerator.generateHtmlRepresentation(ctx, serviceRequest, null)
+                } else {
+                    resourceHtmlGenerator.generateDivRepresentation(ctx, serviceRequest, null).toByteArray(Charsets.UTF_8)
+                }
+            }
             else -> {
-                val byteArray = byteArrayOf(0x48, 101, 108, 108, 111)
-                return byteArray
+                return byteArrayOf(0x48, 101, 108, 108, 111)
             }
         }
 
