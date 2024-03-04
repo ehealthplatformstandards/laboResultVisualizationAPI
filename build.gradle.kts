@@ -8,13 +8,11 @@ plugins {
 }
 
 buildscript {
-
     repositories {
         mavenCentral()
         maven { url = uri("https://maven.taktik.be/content/groups/public") }
     }
     dependencies {
-        classpath("com.taktik.gradle:gradle-plugin-git-version:2.0.5-g16ba274290")
         classpath("com.taktik.gradle:gradle-plugin-helm-repository:0.2.20-7b38909679")
     }
 
@@ -26,13 +24,9 @@ val mavenReleasesRepository: String by project
 
 val kotlinCoroutinesVersion = "1.6.4"
 
-apply(plugin = "git-version")
-
-val gitVersion: String by project
 group = "io.icure"
-version = gitVersion
 
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 apply(plugin = "helm-repository")
 
