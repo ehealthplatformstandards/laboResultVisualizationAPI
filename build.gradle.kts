@@ -2,15 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val mavenRepository: String by project
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://maven.taktik.be/content/groups/public") }
-}
-
 plugins {
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
-    id("com.taktik.gradle.git-version") version "2.0.13-gd2de854853"
+    id("com.taktik.gradle.git-version") version "2.0.5-g16ba274290"
     id("org.springframework.boot") version "2.6.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
@@ -18,12 +13,21 @@ plugins {
 buildscript {
     repositories {
         mavenCentral()
+        gradlePluginPortal()
         maven { url = uri("https://maven.taktik.be/content/groups/public") }
+        maven { url = uri("https://repo.spring.io/plugins-release") }
     }
     dependencies {
         classpath("com.taktik.gradle:gradle-plugin-helm-repository:0.2.20-7b38909679")
     }
 
+}
+
+repositories {
+    mavenCentral()
+    maven { url = uri("https://maven.taktik.be/content/groups/public") }
+    maven { url = uri("https://www.e-contract.be/maven2/") }
+    maven { url = uri("https://repo.ehealth.fgov.be/artifactory/maven2/") }
 }
 
 val repoUsername: String by project
