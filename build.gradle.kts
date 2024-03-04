@@ -4,7 +4,7 @@ val mavenRepository: String by project
 val mavenReleasesRepository: String by project
 
 plugins {
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.5.31"
     id("org.springframework.boot") version "2.6.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
@@ -26,8 +26,6 @@ buildscript {
 repositories {
     mavenCentral()
     maven { url = uri("https://maven.taktik.be/content/groups/public") }
-    maven { url = uri("https://www.e-contract.be/maven2/") }
-    maven { url = uri("https://repo.ehealth.fgov.be/artifactory/maven2/") }
 }
 
 val repoUsername: String by project
