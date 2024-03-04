@@ -17,7 +17,7 @@ steps:
 
     -   name: 'docker:24-git'
         entrypoint: 'sh'
-        args: [ '-c', 'docker build --progress=plain -f build.Dockerfile --push -t "docker.taktik.be/icure/ehealth-fhirviz:$(cat git.version)" --build-arg "repoUsername=$$REPO_USERNAME" --build-arg "repoPassword=$$REPO_PASSWORD" .' ]
+        args: [ '-c', 'docker build --progress=plain -f Dockerfile --push -t "docker.taktik.be/icure/ehealth-fhirviz:$(cat git.version)" --build-arg "repoUsername=$$REPO_USERNAME" --build-arg "repoPassword=$$REPO_PASSWORD" .' ]
         secretEnv: [ 'REPO_USERNAME', 'REPO_PASSWORD' ]
 
     -   name: 'docker:24-git'
