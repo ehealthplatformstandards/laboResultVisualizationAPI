@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val mavenRepository: String by project
+val mavenReleasesRepository: String by project
 
 plugins {
     kotlin("jvm") version "1.5.31"
@@ -40,15 +41,7 @@ val gitVersion: String? by project
 group = "io.icure"
 version = gitVersion ?: "0.0.1-SNAPSHOT"
 
-java.sourceCompatibility = JavaVersion.VERSION_17
-
 apply(plugin = "helm-repository")
-
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    languageVersion = "1.5"
-    jvmTarget = "17"
-}
 
 repositories {
     mavenCentral()
@@ -59,6 +52,18 @@ repositories {
         }
         url = uri(extra["mavenRepository"].toString())
     }
+}
+
+val compileKotlin: KotlinCompile by tasks
+
+compileKotlin.kotlinOptions {
+    languageVersion = "1.5"
+    jvmTarget = "17"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -90,14 +95,6 @@ dependencies {
     implementation(group = "org.springdoc", name = "springdoc-openapi-kotlin", version = "1.7.0")
 
 }
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
-    }
-}
-
 tasks.withType<Test> {
     useJUnitPlatform()
 }
