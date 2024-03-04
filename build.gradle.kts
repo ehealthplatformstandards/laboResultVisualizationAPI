@@ -43,17 +43,6 @@ version = gitVersion ?: "0.0.1-SNAPSHOT"
 
 apply(plugin = "helm-repository")
 
-repositories {
-    mavenCentral()
-    maven {
-        credentials {
-            username = extra["repoUsername"].toString()
-            password = extra["repoPassword"].toString()
-        }
-        url = uri(extra["mavenRepository"].toString())
-    }
-}
-
 val compileKotlin: KotlinCompile by tasks
 
 compileKotlin.kotlinOptions {
