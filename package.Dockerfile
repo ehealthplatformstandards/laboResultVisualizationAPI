@@ -4,7 +4,7 @@ FROM --platform=$BUILDPLATFORM docker.taktik.be/icure/ehealth-fhirviz:$version a
 FROM ghcr.io/graalvm/graalvm-ce:ol9-java17-22.3.2
 ARG version
 ARG TARGETARCH
-COPY --from=builder /build/icure-kraken-$version.jar ./
+COPY --from=builder /build/ehealth-fhirviz-$version.jar ./
 COPY docker-entrypoint.sh /
 RUN curl -sSL https://github.com/krallin/tini/releases/download/v0.19.0/tini-$TARGETARCH -o /usr/local/bin/tini && chmod +x /usr/local/bin/tini
 VOLUME /tmp
