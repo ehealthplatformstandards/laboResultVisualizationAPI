@@ -42,10 +42,6 @@ compileKotlin.kotlinOptions {
     jvmTarget = "17"
 }
 
-configure<com.taktik.gradle.plugins.flowr.DockerJavaPluginExtension> {
-    imageRepoAndName = "icure/ehealth-fhirviz"
-}
-
 repositories {
     mavenCentral()
     maven {
