@@ -2,6 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val mavenRepository: String by project
 
+repositories {
+    mavenCentral()
+    maven { url = uri("https://maven.taktik.be/content/groups/public") }
+}
+
 plugins {
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
