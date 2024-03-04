@@ -19,4 +19,11 @@ steps:
             - 'ORG_GRADLE_PROJECT_mavenReleasesRepository=https://maven.taktik.be/content/repositories/releases/'
             - 'ORG_GRADLE_PROJECT_mavenSnapshotsRepository=https://maven.taktik.be/content/repositories/snapshots/'
 
+availableSecrets:
+    secretManager:
+        - versionName: projects/taktik-dev/secrets/ci-repo-username/versions/1
+          env: 'REPO_USERNAME'
+        - versionName: projects/taktik-dev/secrets/ci-repo-password/versions/1
+          env: 'REPO_PASSWORD'
+
 timeout: 900s
