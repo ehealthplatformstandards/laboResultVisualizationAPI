@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val mavenRepository: String by project
+
 plugins {
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
@@ -21,7 +23,6 @@ buildscript {
 
 val repoUsername: String by project
 val repoPassword: String by project
-val mavenReleasesRepository: String by project
 
 val kotlinCoroutinesVersion = "1.6.4"
 

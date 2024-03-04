@@ -1,4 +1,5 @@
 rootProject.name = "ehealth-fhirviz"
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
