@@ -1,5 +1,5 @@
 ARG version
-FROM --platform=$BUILDPLATFORM docker.taktik.be/icure/kraken-base:$version as builder
+FROM --platform=$BUILDPLATFORM docker.taktik.be/icure/ehealth-fhirviz:$version as builder
 
 FROM ghcr.io/graalvm/graalvm-ce:ol9-java17-22.3.2
 ARG version
