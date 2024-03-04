@@ -7,20 +7,9 @@ plugins {
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.5.31"
     id("com.taktik.gradle.git-version") version "2.0.13-gd2de854853"
+    id("com.taktik.gradle.helm-repository") version "0.2.24-g9f69211aad"
     id("org.springframework.boot") version "2.6.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-        maven { url = uri("https://maven.taktik.be/content/groups/public") }
-    }
-    dependencies {
-        classpath("com.taktik.gradle:gradle-plugin-helm-repository:0.2.20-7b38909679")
-    }
-
 }
 
 repositories {
@@ -37,7 +26,6 @@ val gitVersion: String? by project
 
 group = "io.icure"
 version = gitVersion ?: "0.0.1-SNAPSHOT"
-apply(plugin = "helm-repository")
 
 val compileKotlin: KotlinCompile by tasks
 

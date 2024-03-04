@@ -5,8 +5,9 @@ ENV ORG_GRADLE_PROJECT_repoUsername=$repoUsername
 ENV ORG_GRADLE_PROJECT_repoPassword=$repoPassword
 
 WORKDIR /build
-COPY . ./
 RUN apk --no-cache add bash # for git-version plugin
+
+COPY . ./
 
 RUN ./gradlew -x test build
 RUN ./gradlew -x test :helmize

@@ -6,7 +6,7 @@
 !build.gradle.kts
 !gradle.properties
 !gradlew
-!settings.gradle
+!settings.gradle.kts
 !git.version
 !.editorconfig
 !buildSrc/src
