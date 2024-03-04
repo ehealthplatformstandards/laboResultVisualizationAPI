@@ -6,7 +6,6 @@ val mavenReleasesRepository: String by project
 plugins {
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
-    id("com.taktik.gradle.git-version") version "2.0.5-g16ba274290"
     id("org.springframework.boot") version "2.6.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
@@ -36,10 +35,7 @@ val repoPassword: String by project
 
 val kotlinCoroutinesVersion = "1.6.4"
 
-val gitVersion: String? by project
-
 group = "io.icure"
-version = gitVersion ?: "0.0.1-SNAPSHOT"
 
 apply(plugin = "helm-repository")
 
