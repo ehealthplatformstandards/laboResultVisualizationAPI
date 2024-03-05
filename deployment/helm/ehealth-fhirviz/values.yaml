@@ -8,11 +8,11 @@ ingressClassName: "haproxy"
 
 images:
   fhirviz:
-    repository: "taktik/ehealth-fhirviz"
+    repository: "icure/ehealth-fhirviz"
     tag: ""
     replicaCount: 1
-    javaOpts: "-XX:MaxRAMPercentage=70"
-    memoryRequest: "4Gi"
+    javaOpts: "-Xmx1024m"
+    memoryRequest: "2Gi"
     cpuRequest: 5m
     cpuLimit: 2
     debug: true
