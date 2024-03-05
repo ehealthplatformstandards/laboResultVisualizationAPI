@@ -65,7 +65,7 @@ spec:
                   {{- if not .Values.images.fhirviz.noReadiness }}
                   readinessProbe:
                       httpGet:
-                          path: /actuator/health
+                          path: /actuator/health/readiness
                           port: 8912
                       initialDelaySeconds: 30
                       periodSeconds: 15
@@ -76,7 +76,7 @@ spec:
                   {{- if not .Values.images.fhirviz.noLiveness }}
                   livenessProbe:
                       httpGet:
-                          path: /actuator/health
+                          path: /actuator/health/liveness
                           port: 8912
                       initialDelaySeconds: 600
                       periodSeconds: 15

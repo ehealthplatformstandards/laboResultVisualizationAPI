@@ -10,4 +10,4 @@ RUN curl -sSL https://github.com/krallin/tini/releases/download/v0.19.0/tini-$TA
 VOLUME /tmp
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/docker-entrypoint.sh"]
-#HEALTHCHECK --interval=150s --timeout=5m --retries=1 --start-period=10m CMD curl -f -s --retry 10 --max-time 2 --retry-delay 15 --retry-all-errors http://localhost:8080/actuator/health/liveness || (kill -s 15 -1 && (sleep 10; kill -s 9 -1))
+#HEALTHCHECK --interval=150s --timeout=5m --retries=1 --start-period=10m CMD curl -f -s --retry 10 --max-time 2 --retry-delay 15 --retry-all-errors http://localhost:8912/actuator/health/liveness || (kill -s 15 -1 && (sleep 10; kill -s 9 -1))
