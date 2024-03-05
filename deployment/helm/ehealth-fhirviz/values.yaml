@@ -8,7 +8,7 @@ ingressClassName: "haproxy"
 
 images:
   fhirviz:
-    repository: "icure/ehealth-fhirviz"
+    repository: "docker.taktik.be/icure/ehealth-fhirviz"
     tag: ""
     replicaCount: 1
     javaOpts: "-Xmx1024m"
