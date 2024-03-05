@@ -57,6 +57,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.1")
 
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
     implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.5")
 
     // Logging
