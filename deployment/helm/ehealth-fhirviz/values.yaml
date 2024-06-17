@@ -11,8 +11,8 @@ images:
     repository: "docker.taktik.be/icure/ehealth-fhirviz"
     tag: ""
     replicaCount: 1
-    javaOpts: "-Xmx1024m"
-    memoryRequest: "2Gi"
+    javaOpts: "-Xmx2048m"
+    memoryRequest: "3Gi"
     cpuRequest: 5m
     cpuLimit: 2
     debug: true
