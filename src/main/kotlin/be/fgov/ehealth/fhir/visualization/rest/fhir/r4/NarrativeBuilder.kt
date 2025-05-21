@@ -3,36 +3,29 @@ package be.fgov.ehealth.fhir.visualization.rest.fhir.r4
 import be.fgov.ehealth.fhir.narrative.gen.ResourceHtmlGenerator
 import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.*
-import kotlin.reflect.KClass
 
 class NarrativeBuilder {
 
     companion object {
-        fun <T : Any> makeNarrative(fhirData: ByteArray, embedInHtml: Boolean, resource: KClass<T>): ByteArray {
+        fun makeNarrative(fhirData: ByteArray, embedInHtml: Boolean): ByteArray {
 
-            val ctx = FhirContext.forR4()
+            val fhirContext  = FhirContext.forR4()
 
-            val tag = "<".toCharArray()
-
-            var parser = ctx.newJsonParser()
-            when (String(fhirData)[0]) {
-                tag[0] -> parser = ctx.newXmlParser()
+            val content = fhirData.toString(Charsets.UTF_8).trimStart()
+            val parser = when {
+                content.startsWith("{") || content.startsWith("[")  -> fhirContext.newJsonParser()
+                content.startsWith("<") || content.startsWith("<?xml") -> fhirContext.newXmlParser()
+                else -> fhirContext.newJsonParser()
             }
 
-            val unstrippedResource: Resource = when (resource) {
-                Bundle::class -> parser.parseResource(Bundle::class.java, fhirData.toString(Charsets.UTF_8))
-                Immunization::class -> parser.parseResource(Immunization::class.java, fhirData.toString(Charsets.UTF_8))
-                AllergyIntolerance::class -> parser.parseResource(AllergyIntolerance::class.java, fhirData.toString(Charsets.UTF_8))
-                ServiceRequest::class -> parser.parseResource(ServiceRequest::class.java, fhirData.toString(Charsets.UTF_8))
-                else -> parser.parseResource(Bundle::class.java, fhirData.toString(Charsets.UTF_8))
-            }
+            val resource = parser.parseResource(fhirData.inputStream()) as Resource
 
-            val narrative = FhirNarrativeUtils.stripNarratives(unstrippedResource)
+            val narrative = FhirNarrativeUtils.stripNarratives(resource)
 
             return if (embedInHtml) {
-                ResourceHtmlGenerator().generateHtmlRepresentation(ctx, narrative, null)
+                ResourceHtmlGenerator().generateHtmlRepresentation(fhirContext , narrative, null)
             } else {
-                ResourceHtmlGenerator().generateDivRepresentation(ctx, narrative, null).toByteArray(Charsets.UTF_8)
+                ResourceHtmlGenerator().generateDivRepresentation(fhirContext , narrative, null).toByteArray(Charsets.UTF_8)
             }
 
         }
