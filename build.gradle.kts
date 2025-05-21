@@ -13,7 +13,7 @@ buildscript {
 
     repositories {
         mavenCentral()
-		maven { url = uri("file://C:/Users/eh068/Documents/LaboResultVisualizer/laboResultVisualization2/target/mvn-repo") }
+		maven { url = uri("file://C:/Users/eh068/Documents/1.Standards/laboResultVisualization/target/mvn-repo") }
         //maven { url = uri("https://ehealthplatformstandards.github.io/laboResultVisualization/") }
         //maven { url = uri("file://C:/Temp/toy/laboResultVisualization/target/mvn-repo") }
     }
@@ -50,7 +50,7 @@ compileKotlin.kotlinOptions {
 
 repositories {
     mavenCentral()
-	maven { url = uri("file://C:/Users/eh068/Documents/LaboResultVisualizer/laboResultVisualization2/target/mvn-repo") }
+	maven { url = uri("file://C:/Users/eh068/Documents/1.Standards/laboResultVisualization/target/mvn-repo") }
     //maven { url = uri("file://C:/Temp/toy/laboResultVisualization/target/mvn-repo") }
     //maven { url = uri("https://ehealthplatformstandards.github.io/laboResultVisualization") }
     /*
@@ -66,8 +66,8 @@ repositories {
 
 dependencies {
     implementation("be.fgov.ehealth:fhir-visualization-tool:1.13")
-    implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.10.3")
-    implementation("ca.uhn.hapi.fhir:hapi-fhir-base:6.10.3")
+    implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.6.1")
+    implementation("ca.uhn.hapi.fhir:hapi-fhir-base:7.6.1")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -82,7 +82,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0")
     implementation("com.fasterxml.jackson.core:jackson-core:2.16.0-rc1")
 
-    implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.5")
+    implementation(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.8")
 
     // Logging
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.10")
