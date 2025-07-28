@@ -16,7 +16,8 @@ import reactor.core.publisher.Mono
 class ReferralController(val validatorService: ValidatorService) : ControllerInterface {
 
     override fun fhirValidatorAsync() = validatorService.getValidatorAsync(listOf(
-            "https://build.fhir.org/ig/hl7-be/referral/branches/earlyadopter/"
+            "https://build.fhir.org/ig/hl7-be/referral/branches/earlyadopter/",
+            "hl7.fhir.be.infsec#1.2.0"
     ))
 
     @PostMapping("html", consumes = ["application/json", "application/xml"])

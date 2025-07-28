@@ -16,7 +16,8 @@ import reactor.core.publisher.Mono
 class AllergyController(val validatorService: ValidatorService) : ControllerInterface {
 
     override fun fhirValidatorAsync() = validatorService.getValidatorAsync(listOf(
-            "hl7.fhir.be.allergy#1.2.0"
+            "hl7.fhir.be.allergy#1.2.0",
+            "hl7.fhir.be.infsec#1.2.0"
     ))
 
     @PostMapping("html", consumes = ["application/json", "application/xml"])
