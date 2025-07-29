@@ -26,7 +26,7 @@ class SwaggerConfig {
     fun visualizationR4Api(springOperationCustomizer: OperationCustomizer): GroupedOpenApi = GroupedOpenApi.builder().group("r4").pathsToMatch("/rest/fhir/r4/**").packagesToScan("be.fgov.ehealth.fhir.visualization.rest.fhir.r4").addOpenApiCustomiser { openApi ->
         openApi.info(
             Info().title("Ehealth FHIR visualization App")
-                .description("Ehealth FHIR visualization App formats several FHIR resources to html or pdf")
+                .description("The Ehealth FHIR visualization App enables users to submit FHIR resources and receive HTML visualizations and validation feedback.")
                 .version("r4"))
     }.addOperationCustomizer(springOperationCustomizer).build()
 
@@ -39,13 +39,13 @@ class SwaggerConfig {
                         handlerMethod.methodParameters.indexOfFirst { mp -> (mp.parameterAnnotations.find { it is RequestParam }?.let { it as? RequestParam }?.name?.takeIf { it.isNotEmpty() } ?: mp.parameter.name) == p.name }
                     })
                 }
-            } catch(e:IllegalStateException) {}
+            } catch(_:IllegalStateException) {}
         }
     }
 
     @Bean
     fun customOpenAPI(): OpenAPI = OpenAPI()
             .info(Info().title("Ehealth FHIR visualization App").version("all")
-                    .description("Ehealth FHIR visualization App formats several FHIR resources to html or pdf"))
+                    .description("The Ehealth FHIR visualization App enables users to submit FHIR resources and receive HTML visualizations and validation feedback."))
 
 }
