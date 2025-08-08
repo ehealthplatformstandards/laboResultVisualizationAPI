@@ -1,9 +1,13 @@
 package be.fgov.ehealth.fhir.visualization.rest.fhir.r4
 
+import be.fgov.ehealth.fhir.visualization.doc.ExampleBodies.EXAMPLE_REQUEST_JSON
 import be.fgov.ehealth.fhir.visualization.dto.HtmlWithValidation
 import be.fgov.ehealth.fhir.visualization.dto.Validation
 import be.fgov.ehealth.fhir.visualization.service.ValidatorService
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.reactor.mono
 import org.springframework.http.server.reactive.ServerHttpResponse
@@ -21,12 +25,48 @@ class AllergyController(val validatorService: ValidatorService) : ControllerInte
     ))
 
     @PostMapping("html", consumes = ["application/json", "application/xml"])
-    @Operation(summary = "Convert FHIR file to html")
+    @Operation(
+        summary = "Convert FHIR file to html",
+        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ByteArray::class),
+                    examples = [
+                        ExampleObject(
+                            name = "sample",
+                            summary = "Example Request",
+                            value = EXAMPLE_REQUEST_JSON
+                        )
+                    ]
+                )
+            ]
+        )
+    )
     override fun html(@RequestBody fhirFile: ByteArray, response: ServerHttpResponse): Mono<Void> =
             ResponseBuilder.makeResponse(fhirFile, response, true)
 
     @PostMapping("html/validate", consumes = ["application/json", "application/xml"])
-    @Operation(summary = "Validate and convert FHIR file to object including validation information and html representation")
+    @Operation(
+        summary = "Validate and convert FHIR file to object including validation information and html representation",
+        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ByteArray::class),
+                    examples = [
+                        ExampleObject(
+                            name = "sample",
+                            summary = "Example Request",
+                            value = EXAMPLE_REQUEST_JSON
+                        )
+                    ]
+                )
+            ]
+        )
+    )
     override fun htmlAndValidate(@RequestBody fhirFile: ByteArray) = mono {
 
         fhirValidatorAsync().await().validate(fhirFile).let { (errors, validationReport) ->
@@ -40,7 +80,25 @@ class AllergyController(val validatorService: ValidatorService) : ControllerInte
     }
 
     @PostMapping("validate", consumes = ["application/json", "application/xml"])
-    @Operation(summary = "Validate vaccination report")
+    @Operation(
+        summary = "Validate vaccination report",
+        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ByteArray::class),
+                    examples = [
+                        ExampleObject(
+                            name = "sample",
+                            summary = "Example Request",
+                            value = EXAMPLE_REQUEST_JSON
+                        )
+                    ]
+                )
+            ]
+        )
+    )
     override fun validate(@RequestBody fhirFile: ByteArray) = mono {
 
         fhirValidatorAsync().await().validate(fhirFile).let { (errors) ->
