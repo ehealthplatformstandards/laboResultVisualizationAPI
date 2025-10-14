@@ -13,11 +13,10 @@ buildscript {
 
     repositories {
         mavenCentral()
-		maven { url = uri("file://C:/Users/eh068/Documents/1.Standards/laboResultVisualization/target/mvn-repo") }
+		maven { url = uri("file://" + projectDir.parentFile.toString() + "/laboResultVisualization/target/mvn-repo") }
         //maven { url = uri("https://ehealthplatformstandards.github.io/laboResultVisualization/") }
         //maven { url = uri("file://C:/Temp/toy/laboResultVisualization/target/mvn-repo") }
     }
-
 }
 
 val repoPassword: String by project
@@ -50,7 +49,7 @@ compileKotlin.kotlinOptions {
 
 repositories {
     mavenCentral()
-    maven { url = uri("/home/yourUsername/IdeaProjects/laboResultVisualization/target/mvn-repo") }
+    maven { url = uri("file://" + projectDir.parentFile.toString() + "/laboResultVisualization/target/mvn-repo") }
     //maven { url = uri("https://ehealthplatformstandards.github.io/laboResultVisualization") }
     /*
     maven {
