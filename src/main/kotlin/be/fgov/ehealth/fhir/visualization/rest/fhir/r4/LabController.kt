@@ -23,7 +23,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("/rest/fhir/r4/viz/lab")
-@Tag(name = "fhir")
+@Tag(name = "Lab")
 class LabController(private val validatorService: ValidatorService) : ControllerInterface {
 
     override fun fhirValidatorAsync() = validatorService.getValidatorAsync(listOf(
