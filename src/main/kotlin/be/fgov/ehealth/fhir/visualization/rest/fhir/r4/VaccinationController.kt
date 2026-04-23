@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/rest/fhir/r4/viz/vaccination")
-@Tag(name = "fhir")
+@Tag(name = "Vaccination")
 class VaccinationController(private val validatorService: ValidatorService) : ControllerInterface {
 
     override fun fhirValidatorAsync() = validatorService.getValidatorAsync(listOf(

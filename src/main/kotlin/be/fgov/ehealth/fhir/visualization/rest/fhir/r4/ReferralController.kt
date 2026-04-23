@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/rest/fhir/r4/viz/referral")
-@Tag(name = "fhir")
+@Tag(name = "Referral")
 class ReferralController(val validatorService: ValidatorService) : ControllerInterface {
 
     override fun fhirValidatorAsync() = validatorService.getValidatorAsync(listOf(

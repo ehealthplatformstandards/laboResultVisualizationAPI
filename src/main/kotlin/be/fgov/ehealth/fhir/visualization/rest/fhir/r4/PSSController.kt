@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/rest/fhir/r4/viz/pss")
-@Tag(name = "fhir")
+@Tag(name = "PSS")
 class PSSController(val validatorService: ValidatorService) : ControllerInterface {
 
     override fun fhirValidatorAsync() = validatorService.getValidatorAsync(listOf(
